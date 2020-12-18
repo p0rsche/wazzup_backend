@@ -29,15 +29,21 @@ export default {
   verifyAccessToken(token: string): Promise<UserModelJWT> | never {
     return verifyToken(token, accessTokenSecret);
   },
-  generateAccessToken(payload: UserModelJWT): string {
+  generateAccessToken(
+    payload: Partial<UserModelJWT>,
+    expiresIn: string | number = JWT_ACCESS_TOKEN_EXPIRATION + 'ms'
+  ): string {
     const accessToken = jwt.sign(payload, accessTokenSecret, {
-      expiresIn: JWT_ACCESS_TOKEN_EXPIRATION + 'ms',
+      expiresIn,
     });
     return accessToken;
   },
-  generateRefreshToken(payload: UserModelJWT): string {
+  generateRefreshToken(
+    payload: Partial<UserModelJWT>,
+    expiresIn: string | number = JWT_REFRESH_TOKEN_EXPIRATION + 'ms'
+  ): string {
     const refreshToken = jwt.sign({ id: payload.id }, refreshTokenSecret, {
-      expiresIn: JWT_REFRESH_TOKEN_EXPIRATION + 'ms',
+      expiresIn,
     });
     return refreshToken;
   },

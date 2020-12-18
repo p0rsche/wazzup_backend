@@ -1,4 +1,3 @@
-import { TokenExpiredError } from 'jsonwebtoken';
 import { JWT_REFRESH_TOKEN_COOKIE_NAME } from '../helpers/constants';
 import jwt_utils from '../helpers/jwt_utils';
 import { error } from '../helpers/responses';
@@ -6,7 +5,7 @@ import { IExpressMiddlewareAsync } from '../helpers/types';
 
 export const checkRefreshTokenValidity: IExpressMiddlewareAsync = async (req, res, next) => {
   //check HttpOnly cookie for refresh token
-  const refreshToken = req.cookies[JWT_REFRESH_TOKEN_COOKIE_NAME];
+  const refreshToken = req.cookies?.[JWT_REFRESH_TOKEN_COOKIE_NAME];
   if (!refreshToken) {
     res.json(error(403, 'No refresh token found'));
     return;
@@ -17,13 +16,14 @@ export const checkRefreshTokenValidity: IExpressMiddlewareAsync = async (req, re
     res.locals.id = id;
   } catch (e) {
     res.json(error(403, 'Refresh token validation error'));
+    return;
   }
   //all is great, proceeding next
   next();
 };
 
 export const checkAuthorization: IExpressMiddlewareAsync = async (req, res, next) => {
-  const { authorization } = req.headers;
+  const authorization = req.headers?.authorization;
   if (authorization) {
     try {
       const token = authorization.split(' ').pop();
